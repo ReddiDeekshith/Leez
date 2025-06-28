@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,6 +28,8 @@ class _AddListingPageState extends State<AddListingPage> {
   String _seatingCapacity = '';
   String _carType = '';
 
+  bool _isLoading = false;
+
   final String email = 'prudvisatyateja123@gmail.com';
   final int count = 1;
   final double latitude = 12.9716;
@@ -47,13 +48,26 @@ class _AddListingPageState extends State<AddListingPage> {
 
   InputDecoration _inputDecoration(String label) => InputDecoration(
     labelText: label,
+    labelStyle: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[800]),
     filled: true,
     fillColor: Colors.grey[100],
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
+      borderSide: BorderSide(color: Colors.grey.shade300),
     ),
-    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
+      borderSide: BorderSide(color: AppColors.primary, width: 2),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
+      borderSide: BorderSide(color: Colors.red),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(15),
+      borderSide: BorderSide(color: Colors.red, width: 2),
+    ),
+    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
   );
 
   void pickImage() async {
@@ -69,12 +83,15 @@ class _AddListingPageState extends State<AddListingPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      setState(() {
+        _isLoading = true;
+      });
+
       final uri = Uri.parse(
         "https://t314vz6b-5001.inc1.devtunnels.ms/api/products/add-product",
       );
       final request = http.MultipartRequest('POST', uri);
 
-      // Basic fields
       request.fields['email'] = email;
       request.fields['name'] = _name;
       request.fields['category'] = _category;
@@ -84,7 +101,6 @@ class _AddListingPageState extends State<AddListingPage> {
       request.fields['latitude'] = latitude.toString();
       request.fields['longitude'] = longitude.toString();
 
-      // Add specifications with expected keys
       final specs = [
         {'key': 'Fuel Type', 'value': _fuelType},
         {'key': 'Mileage', 'value': _mileage},
@@ -102,7 +118,7 @@ class _AddListingPageState extends State<AddListingPage> {
           index++;
         }
       }
-      // Add image (important: use 'images' as key)
+
       if (_image != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -112,8 +128,13 @@ class _AddListingPageState extends State<AddListingPage> {
           ),
         );
       }
-      // Send request
+
       final response = await request.send();
+
+      setState(() {
+        _isLoading = false;
+      });
+
       if (response.statusCode == 200) {
         _formKey.currentState!.reset();
         setState(() {
@@ -127,8 +148,15 @@ class _AddListingPageState extends State<AddListingPage> {
           _seatingCapacity = '';
           _carType = '';
         });
-      } else {
-        print("Hello");
+        ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+          SnackBar(
+            content: Text('Product has been added successfully.'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            duration: Duration(seconds: 3),
+          ),
+        );
       }
     }
   }
@@ -144,14 +172,7 @@ class _AddListingPageState extends State<AddListingPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
-        
-
-                          decoration: InputDecoration(
-                            hintText: label,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
+        decoration: _inputDecoration(label),
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         maxLines: maxLines,
@@ -179,6 +200,8 @@ class _AddListingPageState extends State<AddListingPage> {
                 .toList(),
         onChanged: onChanged,
         validator: validator,
+        icon: Icon(Icons.arrow_drop_down, color: Colors.black54),
+        dropdownColor: Colors.white,
       ),
     );
   }
@@ -225,6 +248,7 @@ class _AddListingPageState extends State<AddListingPage> {
                 (val) => _specialization = val ?? '',
                 maxLines: 2,
               ),
+
               if (_category == 'bike') ...[
                 buildDropdown(
                   'Fuel Type',
@@ -280,6 +304,7 @@ class _AddListingPageState extends State<AddListingPage> {
                   validator: (val) => val == null ? 'Select car type' : null,
                 ),
               ],
+
               buildFormField(
                 'Price',
                 (val) => _price = double.tryParse(val!) ?? 0.0,
@@ -295,7 +320,9 @@ class _AddListingPageState extends State<AddListingPage> {
                                 ? 'Enter valid price'
                                 : null),
               ),
+
               SizedBox(height: 10),
+
               OutlinedButton.icon(
                 onPressed: pickImage,
                 icon: Icon(Icons.image, color: Colors.black),
@@ -308,6 +335,7 @@ class _AddListingPageState extends State<AddListingPage> {
                   minimumSize: Size(double.infinity, 48),
                 ),
               ),
+
               if (_image != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -315,15 +343,28 @@ class _AddListingPageState extends State<AddListingPage> {
                     borderRadius: BorderRadius.circular(10),
                     child: Image.file(
                       _image!,
-                      height: 150,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                      height: 100,
+                      width: 100,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
+
+              SizedBox(height: 10),
+
               ElevatedButton(
-                onPressed: saveListing,
-                child: Text("Save Listing"),
+                onPressed: _isLoading ? null : saveListing,
+                child:
+                    _isLoading
+                        ? SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                        : Text("Save Listing"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,

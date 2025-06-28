@@ -16,17 +16,19 @@ class ReturnConfirmationScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ReturnConfirmationScreen> createState() => _ReturnConfirmationScreenState();
+  State<ReturnConfirmationScreen> createState() =>
+      _ReturnConfirmationScreenState();
 }
 
-class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> with SingleTickerProviderStateMixin {
+class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen>
+    with SingleTickerProviderStateMixin {
   int currentStep = 0;
   final List<String> steps = ['Requested', 'Accepted', 'Picked Up', 'Returned'];
   final List<IconData> stepIcons = [
     Icons.assignment_outlined,
     Icons.check_circle_outline,
     Icons.local_shipping_outlined,
-    Icons.task_alt
+    Icons.task_alt,
   ];
   late AnimationController _controller;
   late Animation<double> _stepAnimation;
@@ -88,36 +90,49 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  double scale = isCurrent ? 1.0 + (_stepAnimation.value * 0.1) : 1.0;
+                  double scale =
+                      isCurrent ? 1.0 + (_stepAnimation.value * 0.1) : 1.0;
                   double opacity = _fadeAnimation.value;
 
                   return Transform.scale(
                     scale: scale,
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 300),
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: isCompleted || isCurrent ? Colors.black : Colors.transparent,
+                        color:
+                            isCompleted || isCurrent
+                                ? Colors.black
+                                : Colors.transparent,
                         border: Border.all(
-                          color: isCompleted || isCurrent ? Colors.black : Colors.grey.shade400,
+                          color:
+                              isCompleted || isCurrent
+                                  ? Colors.black
+                                  : Colors.grey.shade400,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(25),
-                        boxShadow: isCompleted || isCurrent ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ] : [],
+                        boxShadow:
+                            isCompleted || isCurrent
+                                ? [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ]
+                                : [],
                       ),
                       child: AnimatedOpacity(
                         duration: Duration(milliseconds: 300),
                         opacity: opacity,
                         child: Icon(
                           isCompleted ? Icons.check : stepIcons[index],
-                          color: isCompleted || isCurrent ? Colors.white : Colors.grey.shade400,
+                          color:
+                              isCompleted || isCurrent
+                                  ? Colors.white
+                                  : Colors.grey.shade400,
                           size: 24,
                         ),
                       ),
@@ -132,7 +147,10 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                   height: 40,
                   margin: EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: index < currentStep ? Colors.black : Colors.grey.shade300,
+                    color:
+                        index < currentStep
+                            ? Colors.black
+                            : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
@@ -156,7 +174,7 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
             animation: _fadeAnimation,
             builder: (context, child) {
               return Container(
-                height: index < steps.length - 1 ? 98 : 58,
+                height: index == 0 ? 50 : 100,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -165,8 +183,12 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                       duration: Duration(milliseconds: 300),
                       style: TextStyle(
                         fontSize: isCurrent ? 18 : 16,
-                        fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
-                        color: isCompleted || isCurrent ? Colors.black : Colors.grey.shade500,
+                        fontWeight:
+                            isCurrent ? FontWeight.bold : FontWeight.w500,
+                        color:
+                            isCompleted || isCurrent
+                                ? Colors.black
+                                : Colors.grey.shade500,
                       ),
                       child: FadeTransition(
                         opacity: _fadeAnimation,
@@ -174,7 +196,7 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                       ),
                     ),
                     if (isCurrent) ...[
-                      SizedBox(height: 4),
+                      SizedBox(height: 5),
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Text(
@@ -199,11 +221,16 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
 
   String _getStepDescription(int index) {
     switch (index) {
-      case 0: return 'Return request initiated';
-      case 1: return 'Request approved by owner';
-      case 2: return 'Item collected for return';
-      case 3: return 'Return process completed';
-      default: return '';
+      case 0:
+        return 'Return request initiated';
+      case 1:
+        return 'Request approved by owner';
+      case 2:
+        return 'Item collected for return';
+      case 3:
+        return 'Return process completed';
+      default:
+        return '';
     }
   }
 
@@ -262,9 +289,10 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 1),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
                         child: Column(
@@ -293,11 +321,16 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.only(top: 8),
-                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                margin: EdgeInsets.only(top: 5),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -314,25 +347,12 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                         ),
                       ),
                       SizedBox(width: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            widget.imageUrl,
-                            width: 90,
-                            height: 90,
-                            fit: BoxFit.cover,
-                          ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          widget.imageUrl,
+                          height: 70,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ],
@@ -395,7 +415,11 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.grey.shade600, size: 20),
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.grey.shade600,
+                          size: 20,
+                        ),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -465,7 +489,10 @@ class _ReturnConfirmationScreenState extends State<ReturnConfirmationScreen> wit
       text: TextSpan(
         style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
         children: [
-          TextSpan(text: '$label: ', style: TextStyle(fontWeight: FontWeight.w500)),
+          TextSpan(
+            text: '$label: ',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           TextSpan(
             text: value,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),

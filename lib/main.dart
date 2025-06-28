@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leez/providers/loginprovider.dart';
+import 'package:leez/screens/onboarding/onboarding.dart';
+import 'package:leez/screens/onboarding/splash.dart';
 import 'package:leez/screens/user_screens/login.dart';
 import 'package:leez/screens/user_screens/mainpage.dart';
 import 'package:leez/screens/vendor_screens/vendor_home.dart';
@@ -33,7 +35,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Leez App',
-      home: isLoggedIn == false ? Login() : MainPage(),
+      home: SplashScreen(isLoggedIn: isLoggedIn),
+      // 👇 Override system text scaling
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(1.0), // 1.0 = no scaling
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

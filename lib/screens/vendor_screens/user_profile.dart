@@ -21,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage_user> {
   };
   String _id = "684feab79fe732f27fbc300b";
   bool isLoading = true;
-  String imageUrl='https://www.w3schools.com/w3images/avatar2.png';
+  String imageUrl = 'https://www.w3schools.com/w3images/avatar2.png';
   @override
   void initState() {
     super.initState();
@@ -40,7 +40,9 @@ class _ProfilePageState extends State<ProfilePage_user> {
         'password': 'dummypassword123',
         'imageUrl': 'https://www.w3schools.com/w3images/avatar2.png',
       };
-      imageUrl = userData['imageUrl'] ?? 'https://www.w3schools.com/w3images/avatar2.png';
+      imageUrl =
+          userData['imageUrl'] ??
+          'https://www.w3schools.com/w3images/avatar2.png';
       isLoading = false;
     });
 
@@ -75,117 +77,131 @@ class _ProfilePageState extends State<ProfilePage_user> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              elevation: 4,
-              shadowColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: height * 0.03),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.04),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    CircleAvatar(
-                      radius: width * 0.12,
-                      backgroundImage: NetworkImage(
-                        imageUrl,
+                    Card(
+                      elevation: 4,
+                      shadowColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: height * 0.03),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: width * 0.12,
+                              backgroundImage: NetworkImage(imageUrl),
+                            ),
+                            SizedBox(height: height * 0.01),
+                            Text(
+                              userData['name']?.toString() ??
+                                  'Name not available',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: width * 0.05,
+                              ),
+                            ),
+                            Text(
+                              'Guest',
+                              style: TextStyle(
+                                fontSize: width * 0.04,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(height: height * 0.01),
-                    Text(
-                      userData['name']?.toString() ?? 'Name not available',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: width * 0.05,
+                    SizedBox(height: height * 0.02),
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: Icon(Icons.home_outlined, color: Colors.white),
+                      label: Text(
+                        'Become a host',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: width * 0.045,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: height * 0.02),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                    Text(
-                      'Guest',
-                      style: TextStyle(
-                        fontSize: width * 0.04,
-                        color: Colors.grey[600],
+                    SizedBox(height: height * 0.02),
+
+                    Divider(),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.settings,
+                      title: 'Account settings',
+                      destination: AccountSettingsPage(),
+                    ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.help_outline,
+                      title: 'Get help',
+                      destination: AccountSettingsPage(),
+                    ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.person_outline,
+                      title: 'View profile',
+                      destination: Viewprofile(
+                        email: userData['email'],
+                        password: userData['password'],
+                        userName: userData['name'],
+                        imageUrl: imageUrl,
+                        phoneNumber: userData['phoneNo'],
                       ),
                     ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.privacy_tip_outlined,
+                      title: 'Privacy',
+                      destination: AccountSettingsPage(),
+                    ),
+                    Divider(),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.group_outlined,
+                      title: 'Refer a host',
+                      destination: AccountSettingsPage(),
+                    ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.group_add_outlined,
+                      title: 'Find a co-host',
+                      destination: AccountSettingsPage(),
+                    ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.description_outlined,
+                      title: 'Legal',
+                      destination: AccountSettingsPage(),
+                    ),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.logout,
+                      title: 'Log out',
+                      destination: AccountSettingsPage(),
+                    ),
+                    SizedBox(height: height * 0.03),
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: height * 0.02),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.home_outlined, color: Colors.white),
-              label: Text(
-                'Become a host',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: width * 0.045,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: height * 0.02),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            SizedBox(height: height * 0.02),
-
-            Divider(),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.settings,
-                title: 'Account settings',
-                destination: AccountSettingsPage()),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.help_outline,
-                title: 'Get help',
-                destination: AccountSettingsPage()),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.person_outline,
-                title: 'View profile',
-                destination:Viewprofile(email: userData['email'],password:userData['password'],userName: userData['name'],imageUrl: imageUrl,phoneNumber: userData['phoneNo'],)),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.privacy_tip_outlined,
-                title: 'Privacy',
-                destination: AccountSettingsPage()),
-            Divider(),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.group_outlined,
-                title: 'Refer a host',
-                destination: AccountSettingsPage()),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.group_add_outlined,
-                title: 'Find a co-host',
-                destination: AccountSettingsPage()),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.description_outlined,
-                title: 'Legal',
-                destination: AccountSettingsPage()),
-            _buildMenuItem(
-                context: context,
-                icon: Icons.logout,
-                title: 'Log out',
-                destination: AccountSettingsPage()),
-            SizedBox(height: height * 0.03),
-          ],
-        ),
-      ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.all(width * 0.04),
         child: ElevatedButton.icon(

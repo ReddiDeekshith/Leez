@@ -1,10 +1,10 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:leez/constants/colors.dart';
-import 'package:leez/screens/user_screens/account.dart';
+
 import 'package:leez/screens/vendor_screens/inbox.dart';
 import 'package:leez/screens/vendor_screens/taskday2.dart';
-
+import 'package:leez/screens/vendor_screens/vendor_profile.dart';
 import 'addlistingpage.dart';
 
 class MainDashboard extends StatefulWidget {
@@ -16,7 +16,7 @@ class _MainDashboardState extends State<MainDashboard> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    DashboardScreen(), // Your existing screen (would redesign similarly)
+    DashboardScreen(),
     AddListingPage(),
     ChatLauncherScreen(),
     MenuScreen(),
@@ -24,92 +24,66 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        body: _pages[_currentIndex],
-        bottomNavigationBar: _buildPremiumNavBar(),
-      ),
-    );
-  }
-
-  Widget _buildPremiumNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.black.withOpacity(0.08), width: 1),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      extendBody: true, // Allows body to extend under the BottomNavigationBar
+      body: _pages[_currentIndex],
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.5),
+              border: const Border(
+                top: BorderSide(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  width: 0.1,
+                ),
+              ),
+            ),
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (index) => setState(() => _currentIndex = index),
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              selectedItemColor: const Color.fromARGB(255, 0, 0, 0),
+              unselectedItemColor: const Color.fromARGB(255, 84, 82, 82),
+              selectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w400,
+                letterSpacing: -0.2,
+              ),
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_rounded),
+                  label: "Home",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add_circle_outline),
+                  activeIcon: Icon(Icons.add_circle),
+                  label: "Add",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.mail_outline),
+                  activeIcon: Icon(Icons.mail),
+                  label: "Inbox",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person_outline),
+                  activeIcon: Icon(Icons.person),
+                  label: "Profile",
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black.withOpacity(0.4),
-        selectedLabelStyle: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          letterSpacing: -0.2,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w400,
-          letterSpacing: -0.2,
-        ),
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.home_outlined, size: 24),
-            ),
-            activeIcon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.home_filled, size: 24),
-            ),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.add_circle_outline, size: 24),
-            ),
-            activeIcon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.add_circle, size: 24),
-            ),
-            label: "Add",
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.person_outline, size: 24),
-            ),
-            activeIcon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.message, size: 24),
-            ),
-            label: "Inbox",
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.person_outline, size: 24),
-            ),
-            activeIcon: Container(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.person, size: 24),
-            ),
-            label: "Profile",
-          ),
-        ],
       ),
     );
   }

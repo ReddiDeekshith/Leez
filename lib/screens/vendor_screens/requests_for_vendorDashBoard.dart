@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:leez/constants/colors.dart';
 
 class RentalRequestsScreen extends StatefulWidget {
   @override
@@ -15,39 +18,77 @@ class _RentalRequestsScreenState extends State<RentalRequestsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Initialize with sample data
-    pendingRequests = [
-      RentalRequest(
-        id: 'REQ001',
-        userName: 'John Doe',
-        itemName: 'Camera Equipment',
-        imageUrl: 'https://via.placeholder.com/150',
-        dateTime: DateTime.now().subtract(Duration(hours: 2)),
-        rentalDuration: '3 days',
-        estimatedCost: 150.0,
-      ),
-      RentalRequest(
-        id: 'REQ002',
-        userName: 'Jane Smith',
-        itemName: 'Laptop',
-        imageUrl: 'https://via.placeholder.com/150',
-        dateTime: DateTime.now().subtract(Duration(hours: 5)),
-        rentalDuration: '1 week',
-        estimatedCost: 200.0,
-      ),
-    ];
+    _fetchRequests();
+  }
 
-    acceptedRequests = [
-      RentalRequest(
-        id: 'REQ003',
-        userName: 'Mike Johnson',
-        itemName: 'Projector',
-        imageUrl: 'https://via.placeholder.com/150',
-        dateTime: DateTime.now().subtract(Duration(days: 1)),
-        rentalDuration: '2 days',
-        estimatedCost: 80.0,
-      ),
-    ];
+  Future<void> _fetchRequests() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://leez-app.onrender.com/api/bookings/pending-rentals/684fb005ef0c1addb3ee47f3',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonBody = jsonDecode(response.body);
+
+        if (jsonBody['success'] == true) {
+          final bookings = jsonBody['bookings'] as List;
+
+          List<RentalRequest> pending = [];
+          List<RentalRequest> accepted = [];
+
+          for (var booking in bookings) {
+            final bookingData = booking['bookings'];
+            final product = booking['product'];
+
+            final status = bookingData['status'];
+
+            RentalRequest request = RentalRequest(
+              id: bookingData['_id'],
+              userName: booking['name'],
+              itemName: product['name'],
+              imageUrl:
+                  "https://res.cloudinary.com/dyigkc2zy/image/upload/v1750151597/${product['images'][0]}",
+              dateTime: DateTime.parse(bookingData['startDateTime']),
+              rentalDuration: _calculateDuration(
+                bookingData['startDateTime'],
+                bookingData['endDateTime'],
+              ),
+              estimatedCost:
+                  double.tryParse(bookingData['price'].toString()) ?? 0,
+            );
+
+            if (status == "pending") {
+              pending.add(request);
+            } else if (status == "accepted") {
+              accepted.add(request);
+            }
+          }
+
+          setState(() {
+            pendingRequests = pending;
+            acceptedRequests = accepted;
+          });
+        }
+      } else {
+        print('Failed to fetch data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  String _calculateDuration(String start, String end) {
+    final startDate = DateTime.parse(start);
+    final endDate = DateTime.parse(end);
+    final diff = endDate.difference(startDate);
+
+    if (diff.inDays >= 1) {
+      return '${diff.inDays} day(s)';
+    } else {
+      return '${diff.inHours} hour(s)';
+    }
   }
 
   void _acceptRequest(RentalRequest request) {
@@ -56,13 +97,13 @@ class _RentalRequestsScreenState extends State<RentalRequestsScreen>
       acceptedRequests.add(request);
     });
 
-    // Switch to accepted tab
     _tabController.animateTo(1);
 
-    // Show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${request.itemName} has been moved to accepted requests!'),
+        content: Text(
+          '${request.itemName} has been moved to accepted requests!',
+        ),
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
         action: SnackBarAction(
@@ -99,14 +140,13 @@ class _RentalRequestsScreenState extends State<RentalRequestsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
+        backgroundColor: AppColors.primary,
         title: Text('Rental Requests'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
-            Tab(text: 'Pending'),
-            Tab(text: 'Accepted'),
-          ],
+          tabs: [Tab(text: 'Pending'), Tab(text: 'Accepted')],
         ),
       ),
       body: TabBarView(
@@ -138,6 +178,10 @@ class PendingRequestsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (pendingRequests.isEmpty) {
+      return Center(child: Text('No pending requests.'));
+    }
+
     return ListView.builder(
       padding: EdgeInsets.all(16.0),
       itemCount: pendingRequests.length,
@@ -156,13 +200,15 @@ class PendingRequestsTab extends StatelessWidget {
 class AcceptedRequestsTab extends StatelessWidget {
   final List<RentalRequest> acceptedRequests;
 
-  const AcceptedRequestsTab({
-    Key? key,
-    required this.acceptedRequests,
-  }) : super(key: key);
+  const AcceptedRequestsTab({Key? key, required this.acceptedRequests})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (acceptedRequests.isEmpty) {
+      return Center(child: Text('No accepted requests.'));
+    }
+
     return ListView.builder(
       padding: EdgeInsets.all(16.0),
       itemCount: acceptedRequests.length,
@@ -200,20 +246,40 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 16.0),
+      color: AppColors.primary,
+      margin: EdgeInsets.only(bottom: 20.0),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
         child: Column(
           children: [
-            // Compressed view
             ListTile(
-              leading: CircleAvatar(
-                backgroundImage: NetworkImage(widget.request.imageUrl),
+              tileColor: AppColors.primary,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 5.0,
+                horizontal: 15.0,
+              ), // More vertical spacing
+              leading: ClipOval(
+                child: Image.network(
+                  widget.request.imageUrl,
+                  width: 70, // Increase size
+                  height: 70,
+                  fit: BoxFit.fill,
+                ),
               ),
-              title: Text(widget.request.itemName),
-              subtitle: Text(widget.request.userName),
+              title: Text(
+                widget.request.itemName,
+                style: TextStyle(
+                  fontSize: 18, // Larger font
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                widget.request.userName,
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              ),
               trailing: Icon(
                 isExpanded ? Icons.expand_less : Icons.expand_more,
+                size: 28,
               ),
               onTap: () {
                 setState(() {
@@ -222,7 +288,6 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
               },
             ),
 
-            // Expanded view
             if (isExpanded) ...[
               Divider(),
               Padding(
@@ -230,22 +295,23 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Request details
                     _buildDetailRow('Request ID:', widget.request.id),
                     SizedBox(height: 8),
-                    _buildDetailRow('Date & Time:',
-                        '${widget.request.dateTime.day}/${widget.request.dateTime.month}/${widget.request.dateTime.year} at ${widget.request.dateTime.hour}:${widget.request.dateTime.minute.toString().padLeft(2, '0')}'),
+                    _buildDetailRow(
+                      'Date & Time:',
+                      '${widget.request.dateTime.day}/${widget.request.dateTime.month}/${widget.request.dateTime.year} at ${widget.request.dateTime.hour}:${widget.request.dateTime.minute.toString().padLeft(2, '0')}',
+                    ),
                     SizedBox(height: 8),
-                    _buildDetailRow('Rental Duration:', widget.request.rentalDuration),
+                    _buildDetailRow(
+                      'Rental Duration:',
+                      widget.request.rentalDuration,
+                    ),
                     SizedBox(height: 8),
-                    _buildDetailRow('Item Name:', widget.request.itemName),
-                    SizedBox(height: 8),
-                    _buildDetailRow('Total Estimated Cost:', '\$${widget.request.estimatedCost.toStringAsFixed(2)}'),
-                    SizedBox(height: 8),
-                    _buildDetailRow('User Name:', widget.request.userName),
+                    _buildDetailRow(
+                      'Total Estimated Cost:',
+                      '\$${widget.request.estimatedCost.toStringAsFixed(2)}',
+                    ),
                     SizedBox(height: 16),
-
-                    // Item image
                     Center(
                       child: Container(
                         height: 150,
@@ -254,14 +320,12 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
                           borderRadius: BorderRadius.circular(8),
                           image: DecorationImage(
                             image: NetworkImage(widget.request.imageUrl),
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fill,
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: 16),
-
-                    // Action buttons (only for pending requests)
                     if (widget.isPending) ...[
                       Row(
                         children: [
@@ -272,12 +336,13 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
                                   context,
                                   'Cancel Request',
                                   'Are you sure you want to cancel this request?',
-                                      () => widget.onCancelRequest?.call(widget.request),
+                                  () => widget.onCancelRequest?.call(
+                                    widget.request,
+                                  ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
                               ),
                               child: Text('Cancel Request'),
                             ),
@@ -290,32 +355,18 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
                                   context,
                                   'Accept Request',
                                   'Are you sure you want to accept this request?',
-                                      () => widget.onAcceptRequest?.call(widget.request),
+                                  () => widget.onAcceptRequest?.call(
+                                    widget.request,
+                                  ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
                               ),
                               child: Text('Accept Request'),
                             ),
                           ),
                         ],
-                      ),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _showDialog(context, 'Contact & Support',
-                                'Contacting support for request ${widget.request.id}');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text('Contact & Support'),
-                        ),
                       ),
                     ],
                   ],
@@ -342,17 +393,17 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
             ),
           ),
         ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(color: Colors.black87),
-          ),
-        ),
+        Expanded(child: Text(value, style: TextStyle(color: Colors.black87))),
       ],
     );
   }
 
-  void _showConfirmDialog(BuildContext context, String title, String message, VoidCallback onConfirm) {
+  void _showConfirmDialog(
+    BuildContext context,
+    String title,
+    String message,
+    VoidCallback onConfirm,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -361,9 +412,7 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
@@ -372,29 +421,12 @@ class _ExpandableRequestCardState extends State<ExpandableRequestCard> {
                 onConfirm();
               },
               style: TextButton.styleFrom(
-                foregroundColor: title.contains('Accept') ? Colors.green : Colors.red,
+                foregroundColor:
+                    title.contains('Accept') ? Colors.green : Colors.red,
               ),
-              child: Text(title.contains('Accept') ? 'Accept' : 'Cancel Request'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
+              child: Text(
+                title.contains('Accept') ? 'Accept' : 'Cancel Request',
+              ),
             ),
           ],
         );

@@ -48,11 +48,23 @@ class MenuScreen extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                buildMenuItem(icon: Icons.account_balance_wallet, title: 'Earnings'),
+                buildMenuItem(
+                  icon: Icons.account_balance_wallet,
+                  title: 'Earnings',
+                ),
                 buildMenuItem(icon: Icons.bar_chart, title: 'Insights'),
-                buildMenuItem(icon: Icons.menu_book_outlined, title: 'Guidebooks'),
-                buildMenuItem(icon: Icons.add_box_outlined, title: 'Create a new listing'),
-                buildMenuItem(icon: Icons.group_add_outlined, title: 'Find a co-host'),
+                buildMenuItem(
+                  icon: Icons.menu_book_outlined,
+                  title: 'Guidebooks',
+                ),
+                buildMenuItem(
+                  icon: Icons.add_box_outlined,
+                  title: 'Create a new listing',
+                ),
+                buildMenuItem(
+                  icon: Icons.group_add_outlined,
+                  title: 'Find a co-host',
+                ),
                 const Divider(),
                 Text(
                   "ACCOUNT",
@@ -73,18 +85,62 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 buildMenuItem(icon: Icons.settings, title: 'Settings'),
-                buildMenuItem(icon: Icons.help_outline, title: 'Visit the Help Centre'),
-                buildMenuItem(icon: Icons.shield_outlined, title: 'Get help with a safety issue'),
-                buildMenuItem(icon: Icons.library_books_outlined, title: 'Explore hosting resources'),
-                buildMenuItem(icon: Icons.group_outlined, title: 'Connect with Hosts near you'),
-                buildMenuItem(icon: Icons.edit_outlined, title: 'Give us feedback'),
-                buildMenuItem(icon: Icons.share_outlined, title: 'Refer a host'),
+                buildMenuItem(
+                  icon: Icons.help_outline,
+                  title: 'Visit the Help Centre',
+                ),
+                buildMenuItem(
+                  icon: Icons.shield_outlined,
+                  title: 'Get help with a safety issue',
+                ),
+                buildMenuItem(
+                  icon: Icons.library_books_outlined,
+                  title: 'Explore hosting resources',
+                ),
+                buildMenuItem(
+                  icon: Icons.group_outlined,
+                  title: 'Connect with Hosts near you',
+                ),
+                buildMenuItem(
+                  icon: Icons.edit_outlined,
+                  title: 'Give us feedback',
+                ),
+                buildMenuItem(
+                  icon: Icons.share_outlined,
+                  title: 'Refer a host',
+                ),
                 const Divider(),
                 const SizedBox(height: 8),
+
+                // Switch to user (moved up)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context); // Example: go back to user view
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "Switch to user",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Logout
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle logout
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -99,6 +155,8 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: height * 0.02),
+
+                // Footer
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -114,33 +172,8 @@ class MenuScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ),
-                SizedBox(height: height * 0.03), // Extra space for bottom bar
+                SizedBox(height: height * 0.03),
               ],
-            ),
-          ),
-        ),
-      ),
-      // Added bottomNavigationBar here
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(width * 0.04),
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pop(context); // Go back to user profile
-          },
-          icon: Icon(Icons.sync_alt),
-          label: Text(
-            "Switch to travelling",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: width * 0.045,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: height * 0.02),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),

@@ -30,9 +30,14 @@ class _SignUp3State extends State<SignUp3> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.center,
             children: [
           SizedBox(height: 20,),
-           const Text(
-                  "Leez",
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+           Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/logo/leez_logo.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(

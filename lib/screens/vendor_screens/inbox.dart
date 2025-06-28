@@ -1,183 +1,258 @@
 import 'package:flutter/material.dart';
+import 'package:leez/constants/colors.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class ChatLauncherScreen extends StatelessWidget {
+class ChatLauncherScreen extends StatefulWidget {
   const ChatLauncherScreen({super.key});
 
+  @override
+  State<ChatLauncherScreen> createState() => _ChatLauncherScreenState();
+}
+
+class _ChatLauncherScreenState extends State<ChatLauncherScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  List<Map<String, String>> complaints = [
+    {
+      'user': 'Deekshith Reddi',
+      'message': 'The bike I rented had a flat tire during the ride.',
+      'time': '2 hours ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A05F4.jpg',
+    },
+    {
+      'user': 'Suchi',
+      'message': 'The car was delivered late by 2 hours.',
+      'time': '5 hours ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A0570.jpg',
+    },
+    {
+      'user': 'Sai Teja',
+      'message': 'The rental prices are too high compared to market rates.',
+      'time': '1 day ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A05E9.jpg',
+    },
+    {
+      'user': 'Balaraju',
+      'message': 'Uploaded pictures do not match the actual product.',
+      'time': '1 day ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A05J1.jpg',
+    },
+    {
+      'user': 'Prudhvi',
+      'message': 'The bike’s mileage does not match the listed specifications.',
+      'time': '2 days ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A0565.jpg',
+    },
+    {
+      'user': 'Dhanunjay',
+      'message': 'The car makes excessive noise while driving.',
+      'time': '2 days ago',
+      'image': 'https://info.aec.edu.in/AEC/StudentPhotos/22A91A0571.jpg',
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    );
+
+    _controller.forward(); // Start animation
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _openChat(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Chat',
-      barrierColor: Colors.black.withOpacity(0.3),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return const ChatOverlay();
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.0, 1.0),
-            end: Offset.zero,
-          ).animate(
-            CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-          ),
-          child: child,
-        );
-      },
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FullScreenChat()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.indigo.withOpacity(0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
+      backgroundColor: AppColors.primary,
+      appBar: AppBar(
+        centerTitle: true,
+        leading: IconButton(onPressed: () => {}, icon: Icon(null)),
+        title: const Text(
+          'Inbox Complaints',
+          style: TextStyle(color: AppColors.secondary),
         ),
-        child: FloatingActionButton.extended(
-          onPressed: () => _openChat(context),
-          backgroundColor: Colors.indigo,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          icon: const Icon(Icons.chat_bubble_outline),
-          label: const Text(
-            "Chat",
-            style: TextStyle(fontWeight: FontWeight.w600),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: ListView.builder(
+        itemCount: complaints.length,
+        itemBuilder: (context, index) {
+          final complaint = complaints[index];
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromARGB(58, 0, 0, 0),
+                  blurRadius: 8,
+                  offset: Offset(2, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipOval(
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Image.network(
+                      complaint['image']!,
+                      fit: BoxFit.fill,
+                      errorBuilder:
+                          (context, error, stackTrace) => Icon(Icons.error),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        complaint['user']!,
+                        style: const TextStyle(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        complaint['message']!,
+                        style: const TextStyle(
+                          color: AppColors.secondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Text(
+                          complaint['time']!,
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FadeTransition(
+        opacity: _fadeAnimation,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 60),
+            child: FloatingActionButton.extended(
+              onPressed: () => _openChat(context),
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.black,
+              icon: const Icon(
+                Icons.chat_bubble_outline,
+                color: AppColors.primary,
+              ),
+              label: const Text(
+                "Chat",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
+// Dummy FullScreenChat for navigation
 
-class ChatOverlay extends StatefulWidget {
-  const ChatOverlay({super.key});
-
-  @override
-  _ChatOverlayState createState() => _ChatOverlayState();
-}
-
-class _ChatOverlayState extends State<ChatOverlay> {
-  double _bottomOffset = 16.0; // Default bottom offset
+class FullScreenChat extends StatelessWidget {
+  const FullScreenChat({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isTablet = screenSize.width > 600;
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
 
-    // Update bottom offset based on keyboard height
-    _bottomOffset = keyboardHeight > 0 ? keyboardHeight + 16.0 : 16.0;
-
-    return Stack(
-      children: [
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          bottom: _bottomOffset,
-          right: 16,
-          child: Material(
-            elevation: 20,
-            borderRadius: BorderRadius.circular(20),
-            shadowColor: Colors.black.withOpacity(0.3),
-            child: Container(
-              width: isTablet ? 400 : screenSize.width * 0.85,
-              height: isTablet ? 600 : screenSize.height * 0.7,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey[200]!, width: 1),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: AppColors.primary, width: 0.1),
               ),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                      gradient: LinearGradient(
-                        colors: [Colors.indigo, Colors.indigo.shade700],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.support_agent,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            'LEEZ Assistant',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            minimumSize: const Size(32, 32),
-                          ),
-                        ),
-                      ],
+              color: AppColors.secondary,
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                const Icon(Icons.support_agent, color: Colors.white),
+                SizedBox(width: 10),
+                Center(
+                  child: const Text(
+                    'LEEZ Assistant',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(20),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(20),
-                        ),
-                        child: const ChatBotWebView(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 20),
+                Spacer(),
+              ],
             ),
           ),
-        ),
-      ],
+          const Expanded(child: ChatBotWebView()),
+        ],
+      ),
     );
   }
 }
@@ -204,20 +279,11 @@ class _ChatBotWebViewState extends State<ChatBotWebView> {
           )
           ..setNavigationDelegate(
             NavigationDelegate(
-              onPageStarted: (String url) {
-                setState(() {
-                  _isLoading = true;
-                });
-              },
-              onPageFinished: (String url) {
-                setState(() {
-                  _isLoading = false;
-                });
-
-                // Inject comprehensive scroll fixes
+              onPageStarted: (url) => setState(() => _isLoading = true),
+              onPageFinished: (url) {
+                setState(() => _isLoading = false);
                 Future.delayed(const Duration(milliseconds: 1500), () {
                   _controller.runJavaScript('''
-                // Global scroll fixes
                 document.documentElement.style.overflow = 'auto';
                 document.documentElement.style.height = '100%';
                 document.body.style.overflow = 'auto';
@@ -226,68 +292,32 @@ class _ChatBotWebViewState extends State<ChatBotWebView> {
                 document.body.style.padding = '0';
                 document.body.style.touchAction = 'manipulation';
                 document.body.style.webkitOverflowScrolling = 'touch';
-                
-                function enableScrolling() {
-                  // Find all possible chat containers
+
+                const enableScrolling = () => {
                   const selectors = [
                     '.bp-chat-container',
-                    '.bp-messenger-sidebar', 
                     '.bp-widget-container',
-                    '.bp-conversation-container',
-                    '.bp-conversation-list',
-                    '[data-testid="chat-container"]',
                     '[class*="chat"]',
-                    '[class*="conversation"]',
                     '[class*="message"]',
-                    'div[style*="overflow: hidden"]',
-                    'div[style*="height"]'
+                    'div[style*="overflow"]'
                   ];
-                  
-                  // Apply fixes to all matching elements
                   selectors.forEach(selector => {
-                    document.querySelectorAll(selector).forEach(element => {
-                      element.style.overflow = 'auto';
-                      element.style.overflowY = 'auto';
-                      element.style.webkitOverflowScrolling = 'touch';
-                      element.style.touchAction = 'pan-y';
-                      element.style.maxHeight = 'none';
+                    document.querySelectorAll(selector).forEach(el => {
+                      el.style.overflowY = 'auto';
+                      el.style.overflow = 'auto';
+                      el.style.webkitOverflowScrolling = 'touch';
                     });
                   });
-                  
-                  // Fix all divs with problematic styles
-                  document.querySelectorAll('div').forEach(div => {
-                    const computedStyle = window.getComputedStyle(div);
-                    if (computedStyle.overflow === 'hidden' || 
-                        computedStyle.overflowY === 'hidden' ||
-                        div.style.overflow === 'hidden') {
-                      div.style.overflow = 'auto';
-                      div.style.overflowY = 'auto';
-                      div.style.webkitOverflowScrolling = 'touch';
-                    }
-                  });
-                  
-                  console.log('Scroll fixes applied');
-                }
-                
-                // Apply fixes immediately and repeatedly
+                };
+
                 enableScrolling();
-                setTimeout(enableScrolling, 1000);
-                setTimeout(enableScrolling, 3000);
+                setTimeout(enableScrolling, 2000);
                 setTimeout(enableScrolling, 5000);
-                
-                // Watch for DOM changes and reapply fixes
-                const observer = new MutationObserver(() => {
-                  setTimeout(enableScrolling, 100);
-                });
-                observer.observe(document.body, { 
-                  childList: true, 
-                  subtree: true, 
-                  attributes: true,
-                  attributeFilter: ['style', 'class']
-                });
-                
-                // Also fix on window resize
-                window.addEventListener('resize', enableScrolling);
+
+                new MutationObserver(() => setTimeout(enableScrolling, 100)).observe(
+                  document.body,
+                  { childList: true, subtree: true }
+                );
               ''');
                 });
               },
@@ -306,30 +336,10 @@ class _ChatBotWebViewState extends State<ChatBotWebView> {
       children: [
         WebViewWidget(controller: _controller),
         if (_isLoading)
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-            ),
-            child: const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.indigo),
-                    strokeWidth: 3,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "Loading chat...",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+          Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondary),
+              strokeWidth: 3,
             ),
           ),
       ],

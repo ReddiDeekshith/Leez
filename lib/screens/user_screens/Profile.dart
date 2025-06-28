@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:leez/screens/user_screens/AccountSettings.dart';
 import 'package:leez/screens/user_screens/account.dart';
@@ -52,218 +51,195 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body:
           isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.04,
-                  vertical: height * 0.02,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Card(
-                      elevation: 3,
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+              ? const Center(child: CircularProgressIndicator())
+              : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildProfileHeader(size),
+                      const SizedBox(height: 24),
+                      _buildSectionTitle("Account"),
+                      const SizedBox(height: 8),
+                      _buildMenuCard(
+                        icon: Icons.settings,
+                        title: "Account Settings",
+                        destination: AccountSettingsPage(),
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: height * 0.03,
-                          horizontal: width * 0.05,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: width * 0.4,
-                              height: width * 0.4,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    "https://res.cloudinary.com/dyigkc2zy/image/upload/v1750151597/" +
-                                            userData['photo'] ??
-                                        imageUrl,
-                                  ),
-                                  fit: BoxFit.fitHeight,
-                                ),
+                      _buildMenuCard(
+                        icon: Icons.help_outline,
+                        title: "Get Help",
+                        destination: const Gethelp(),
+                      ),
+                      _buildViewProfileCard(context),
+                      _buildMenuCard(
+                        icon: Icons.privacy_tip_outlined,
+                        title: "Privacy",
+                        destination: AccountSettingsPage(),
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSectionTitle("Community"),
+                      const SizedBox(height: 8),
+                      _buildMenuCard(
+                        icon: Icons.group_outlined,
+                        title: "Refer a host",
+                        destination: AccountSettingsPage(),
+                      ),
+                      _buildMenuCard(
+                        icon: Icons.group_add_outlined,
+                        title: "Find a co-host",
+                        destination: AccountSettingsPage(),
+                      ),
+                      _buildMenuCard(
+                        icon: Icons.description_outlined,
+                        title: "Legal",
+                        destination: AccountSettingsPage(),
+                      ),
+                      _buildMenuCard(
+                        icon: Icons.logout,
+                        title: "Log out",
+                        destination: AccountSettingsPage(),
+                      ),
+                      const SizedBox(height: 36),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MainDashboard(),
                               ),
+                            );
+                          },
+                          icon: const Icon(Icons.sync_alt, size: 22),
+                          label: const Text(
+                            "Switch to hosting",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                            SizedBox(height: height * 0.02),
-                            Text(
-                              userData['name']?.toString() ??
-                                  'Name not available',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: width * 0.05,
-                              ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Guest',
-                              style: TextStyle(
-                                fontSize: width * 0.04,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
+                            elevation: 4,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: height * 0.025),
-                    // ElevatedButton.icon(
-                    //   onPressed: () {
-                    //     Navigator.push(context, MaterialPageRoute(builder: (context)=>MenuScreen()));
-                    //   },
-                    //   icon: Icon(Icons.home_outlined),
-                    //   label: Text(
-                    //     'Become a host',
-                    //     style: TextStyle(fontWeight: FontWeight.bold),
-                    //   ),
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Colors.black,
-                    //     foregroundColor: Colors.white,
-                    //     padding: EdgeInsets.symmetric(vertical: 14),
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //     ),
-                    //   ),
-                    // ),
-                    SizedBox(height: height * 0.02),
-                    _buildSectionDivider("Account"),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.settings,
-                      title: 'Account settings',
-                      destination: AccountSettingsPage(),
-                    ),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.help_outline,
-                      title: 'Get help',
-                      destination: Gethelp(),
-                    ),
-                    _buildViewProfileItem(context),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.privacy_tip_outlined,
-                      title: 'Privacy',
-                      destination: AccountSettingsPage(),
-                    ),
-                    _buildSectionDivider("Community"),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.group_outlined,
-                      title: 'Refer a host',
-                      destination: AccountSettingsPage(),
-                    ),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.group_add_outlined,
-                      title: 'Find a co-host',
-                      destination: AccountSettingsPage(),
-                    ),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.description_outlined,
-                      title: 'Legal',
-                      destination: AccountSettingsPage(),
-                    ),
-                    _buildMenuItem(
-                      context: context,
-                      icon: Icons.logout,
-                      title: 'Log out',
-                      destination: AccountSettingsPage(),
-                    ),
-                    SizedBox(height: height * 0.04),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(width * 0.04),
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MainDashboard()),
-            );
-          },
-          icon: Icon(Icons.sync_alt),
-          label: Text(
-            "Switch to hosting",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  Widget _buildProfileHeader(Size size) {
+    final double avatarSize = size.width * 0.32;
+    final String avatarUrl =
+        userData['photo'] != null
+            ? "https://res.cloudinary.com/dyigkc2zy/image/upload/v1750151597/${userData['photo']}"
+            : imageUrl;
+
+    return Card(
+      color: Colors.white,
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: avatarSize / 2,
+              backgroundImage: NetworkImage(avatarUrl),
+              backgroundColor: Colors.grey.shade200,
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(
+              userData['name']?.toString() ?? 'Name not available',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "Guest",
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionDivider(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(child: Divider(thickness: 1)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              title,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(child: Divider(thickness: 1)),
-        ],
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
       ),
     );
   }
 
-  Widget _buildMenuItem({
-    required BuildContext context,
+  Widget _buildMenuCard({
     required IconData icon,
     required String title,
     required Widget destination,
   }) {
-    return ListTile(
-      leading: Icon(icon, size: 24, color: Colors.black87),
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+    return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => destination),
         );
       },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 24, color: Colors.black),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildViewProfileItem(BuildContext context) {
-    return ListTile(
-      leading: Icon(Icons.person_outline, size: 24, color: Colors.black87),
-      title: Text(
-        "View/Edit profile",
-        style: TextStyle(fontWeight: FontWeight.w500),
-      ),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+  Widget _buildViewProfileCard(BuildContext context) {
+    return GestureDetector(
       onTap: () async {
         final result = await Navigator.push(
           context,
@@ -274,8 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   password: userData['password'],
                   userName: userData['name'],
                   imageUrl:
-                      "https://res.cloudinary.com/dyigkc2zy/image/upload/v1750151597/" +
-                      userData['photo'],
+                      "https://res.cloudinary.com/dyigkc2zy/image/upload/v1750151597/${userData['photo']}",
                   phoneNumber: userData['phoneNo'],
                   customerId: userData['_id'],
                 ),
@@ -285,6 +260,34 @@ class _ProfilePageState extends State<ProfilePage> {
           loadProfile();
         }
       },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.person_outline, size: 24, color: Colors.black),
+            SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                "View/Edit profile",
+                style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 }

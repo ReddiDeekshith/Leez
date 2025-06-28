@@ -24,270 +24,208 @@ class Login extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 100),
           child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    'leez',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Welcome back to the leez connect',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                  ),
-                  const SizedBox(height: 30),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(
-                            255,
-                            137,
-                            133,
-                            133,
-                          ).withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/logo/leez_logo.png'),
+                      fit: BoxFit.cover,
                     ),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Email or Phone",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your email or phone',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                  ),
+                ),
+                Text(
+                  'Welcome back to the leez connect',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+                const SizedBox(height: 30),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Email or Phone",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your email or phone',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Password",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: passController,
-                          obscureText: provider.obscurePassword,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your password',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                provider.obscurePassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: provider.toggleObscurePassword,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Password",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: passController,
+                        obscureText: provider.obscurePassword,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              provider.obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                            onPressed: provider.toggleObscurePassword,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Checkbox(value: false, onChanged: (v) {}),
-                            const Text("Remember me"),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                "Forgot Password?",
-                                style: TextStyle(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Checkbox(value: false, onChanged: (v) {}),
+                          const Text("Remember me"),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed:
-                                isLoading
-                                    ? null
-                                    : () async {
-                                      provider.toggleLoading(true);
-                                      try {
-                                        final authService = AuthService();
-                                        final res = await authService.login(
-                                          email: emailController.text.trim(),
-                                          password: passController.text.trim(),
-                                        );
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed:
+                              isLoading
+                                  ? null
+                                  : () async {
+                                    provider.toggleLoading(true);
+                                    try {
+                                      final authService = AuthService();
+                                      final res = await authService.login(
+                                        email: emailController.text.trim(),
+                                        password: passController.text.trim(),
+                                      );
 
-                                        if (res.containsKey('success') &&
-                                            res['success'] == true) {
-                                          final prefs =
-                                              await SharedPreferences.getInstance();
-                                          await prefs.setBool(
-                                            'isLoggedIn',
-                                            true,
-                                          );
+                                      if (res.containsKey('success') &&
+                                          res['success'] == true) {
+                                        final prefs =
+                                            await SharedPreferences.getInstance();
+                                        await prefs.setBool('isLoggedIn', true);
 
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                '${res['message']}',
-                                              ),
-                                            ),
-                                          );
-
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => const MainPage(),
-                                            ),
-                                            (route) => false,
-                                          );
-                                        } else {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                res['message'] ??
-                                                    'Login failed',
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      } catch (e) {
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
-                                          SnackBar(content: Text('$e')),
+                                          SnackBar(
+                                            content: Text('${res['message']}'),
+                                          ),
+                                        );
+
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => const MainPage(),
+                                          ),
+                                          (route) => false,
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              res['message'] ?? 'Login failed',
+                                            ),
+                                          ),
                                         );
                                       }
-                                      provider.toggleLoading(false);
-                                    },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text('$e')),
+                                      );
+                                    }
+                                    provider.toggleLoading(false);
+                                  },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
                             ),
-                            child:
-                                isLoading
-                                    ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                    : const Text(
-                                      "Log In",
-                                      style: TextStyle(color: Colors.white),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child:
+                              isLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
                                     ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Row(
-                    children: [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Text('Or Continue With'),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.g_mobiledata,
-                            size: 28,
-                            color: AppColors.secondary,
-                          ),
-                          label: const Text(
-                            'Google',
-                            style: TextStyle(color: AppColors.secondary),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.apple,
-                            size: 28,
-                            color: AppColors.secondary,
-                          ),
-                          label: const Text(
-                            'Apple',
-                            style: TextStyle(color: AppColors.secondary),
-                          ),
+                                  )
+                                  : const Text(
+                                    "Log In",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                         ),
                       ),
                     ],
                   ),
-                  Center(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(color: AppColors.secondary),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUp1(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Sign up",
-                            style: TextStyle(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.bold,
+                ),
+
+                const SizedBox(height: 20),
+
+                Center(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account?",
+                        style: TextStyle(color: AppColors.secondary),
+                        textScaler: TextScaler.linear(1.0),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignUp1(),
                             ),
+                          );
+                        },
+                        child: const Text(
+                          textScaler: TextScaler.linear(1.0),
+                          "Sign up",
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

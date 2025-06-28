@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leez/constants/colors.dart';
 import 'package:leez/screens/user_screens/Profile.dart';
+import 'package:leez/screens/user_screens/my_bookings.dart';
 import 'package:leez/screens/user_screens/productCard.dart';
 import 'package:leez/services/authservice.dart';
 import 'wishlist_screen.dart';
@@ -58,9 +59,13 @@ class _MainPageState extends State<MainPage> {
       case 0:
         return buildHomeContent();
       case 1:
-        return const WishlistScreen();
+        return BookingsScreen();
       case 2:
+        return const WishlistScreen();
+
+      case 3:
         return ProfilePage();
+
       default:
         return const Center(child: Text("Page not found"));
     }
@@ -104,16 +109,73 @@ class _MainPageState extends State<MainPage> {
         currentIndex: selectedIndex,
         onTap: onItemTap,
         type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        elevation: 8,
+
         selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.grey[500],
+
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
+
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w400,
+          letterSpacing: -0.1,
+        ),
+
         showSelectedLabels: true,
+        showUnselectedLabels: true,
+
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.home_outlined, size: 26),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.home_rounded, size: 28),
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.book_outlined, size: 26),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.book, size: 28),
+            ),
+            label: 'Bookings',
+          ),
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.favorite_border, size: 26),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.favorite, size: 28),
+            ),
             label: 'Wishlist',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.person_outline, size: 26),
+            ),
+            activeIcon: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Icon(Icons.person, size: 28),
+            ),
+            label: 'Profile',
+          ),
         ],
       ),
     );
