@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:leez/constants/colors.dart';
+import 'package:leez/screens/suci/product_registration_0.dart';
 
 import 'package:leez/screens/vendor_screens/inbox.dart';
 import 'package:leez/screens/vendor_screens/taskday2.dart';
@@ -17,7 +18,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
   final List<Widget> _pages = [
     DashboardScreen(),
-    AddListingPage(),
+    RentSelectionBottomSheet(),
     ChatLauncherScreen(),
     MenuScreen(),
   ];

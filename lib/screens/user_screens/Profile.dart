@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:leez/screens/onboarding/onboarding.dart';
 import 'package:leez/screens/user_screens/AccountSettings.dart';
-import 'package:leez/screens/user_screens/account.dart';
 import 'package:leez/screens/user_screens/getHelp.dart';
 import 'package:leez/screens/user_screens/viewProfile.dart';
 import 'package:leez/screens/vendor_screens/MainDashboard.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -70,18 +72,39 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildMenuCard(
                         icon: Icons.settings,
                         title: "Account Settings",
-                        destination: AccountSettingsPage(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuCard(
                         icon: Icons.help_outline,
                         title: "Get Help",
-                        destination: const Gethelp(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Gethelp(),
+                            ),
+                          );
+                        },
                       ),
                       _buildViewProfileCard(context),
                       _buildMenuCard(
                         icon: Icons.privacy_tip_outlined,
                         title: "Privacy",
-                        destination: AccountSettingsPage(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                       _buildSectionTitle("Community"),
@@ -89,22 +112,57 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildMenuCard(
                         icon: Icons.group_outlined,
                         title: "Refer a host",
-                        destination: AccountSettingsPage(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuCard(
                         icon: Icons.group_add_outlined,
                         title: "Find a co-host",
-                        destination: AccountSettingsPage(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuCard(
                         icon: Icons.description_outlined,
                         title: "Legal",
-                        destination: AccountSettingsPage(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountSettingsPage(),
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuCard(
                         icon: Icons.logout,
                         title: "Log out",
-                        destination: AccountSettingsPage(),
+                        onTap: () async {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.setBool('isLoggedIn', false);
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      const OnboardingScreen(isLoggedIn: false),
+                            ),
+                            (route) => false, // remove all previous routes
+                          );
+                        },
                       ),
                       const SizedBox(height: 36),
                       Padding(
@@ -167,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 16),
             Text(
               userData['name']?.toString() ?? 'Name not available',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 6),
@@ -195,15 +253,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildMenuCard({
     required IconData icon,
     required String title,
-    required Widget destination,
+    required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => destination),
-        );
-      },
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

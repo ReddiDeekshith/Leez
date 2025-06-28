@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.linear(1.0), // 1.0 = no scaling
           ),
-          child: child!,
+          child: child!,                  
         );
       },
     );

@@ -11,8 +11,19 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen> {
   final authService = AuthService();
+  late Future<Map<String, dynamic>> _favoritesFuture;
 
-  void _navigateToProductDetail(Map<String, dynamic> product) {
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  void _loadFavorites() {
+    _favoritesFuture = authService.fetchfavorites();
+  }
+
+  void _navigateToProductDetail(Map<String, dynamic> product) async {
     final productId = product['_id'];
 
     if (productId == null) {
@@ -22,7 +33,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       return;
     }
 
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder:
@@ -33,15 +44,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
             ),
       ),
     );
+
+    // Refresh wishlist when returning
+    _loadFavorites();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: FutureBuilder<Map<String, dynamic>>(
-        future: authService.fetchfavorites(),
+        future: _favoritesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -110,7 +124,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     ),
                     child: Row(
                       children: [
-                        // Product image with hero animation
                         Hero(
                           tag: product['_id'],
                           child: ClipRRect(
@@ -179,14 +192,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // Price Tag
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
                                         vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
                                         '₹${product['price'] ?? '0'}',
@@ -196,14 +205,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                         ),
                                       ),
                                     ),
-                                    // Rating Badge
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 6,
                                         vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Row(
                                         children: [

@@ -1,18 +1,19 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:leez/screens/onboarding/onboarding.dart';
 import 'package:leez/screens/user_screens/AccountSettings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'MainDashboard.dart';
 import 'edit_profile.dart';
 
 class ProfilePage_user extends StatefulWidget {
   @override
-  State<ProfilePage_user> createState() => _ProfilePageState();
+  State<ProfilePage_user> createState() => _ProfilePage_userState();
 }
 
-class _ProfilePageState extends State<ProfilePage_user> {
+class _ProfilePage_userState extends State<ProfilePage_user> {
   Map<String, dynamic> userData = {
     'name': 'John Doe',
     'email': 'john.doe@example.com',
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage_user> {
   String _id = "684feab79fe732f27fbc300b";
   bool isLoading = true;
   String imageUrl = 'https://www.w3schools.com/w3images/avatar2.png';
+
   @override
   void initState() {
     super.initState();
@@ -29,9 +31,7 @@ class _ProfilePageState extends State<ProfilePage_user> {
   }
 
   Future<void> loadProfile() async {
-    // Simulating API call with dummy data
-    await Future.delayed(Duration(seconds: 1)); // Simulate network delay
-
+    await Future.delayed(Duration(seconds: 1)); // Simulate API delay
     setState(() {
       userData = {
         'name': 'John Smith',
@@ -40,14 +40,9 @@ class _ProfilePageState extends State<ProfilePage_user> {
         'password': 'dummypassword123',
         'imageUrl': 'https://www.w3schools.com/w3images/avatar2.png',
       };
-      imageUrl =
-          userData['imageUrl'] ??
-          'https://www.w3schools.com/w3images/avatar2.png';
+      imageUrl = userData['imageUrl']!;
       isLoading = false;
     });
-
-    print("=============================================");
-    print(userData);
   }
 
   @override
@@ -87,7 +82,6 @@ class _ProfilePageState extends State<ProfilePage_user> {
                   children: [
                     Card(
                       elevation: 4,
-                      shadowColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -102,8 +96,7 @@ class _ProfilePageState extends State<ProfilePage_user> {
                             ),
                             SizedBox(height: height * 0.01),
                             Text(
-                              userData['name']?.toString() ??
-                                  'Name not available',
+                              userData['name'] ?? 'Name not available',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: width * 0.05,
@@ -141,8 +134,9 @@ class _ProfilePageState extends State<ProfilePage_user> {
                       ),
                     ),
                     SizedBox(height: height * 0.02),
-
                     Divider(),
+
+                    // Menu Items
                     _buildMenuItem(
                       context: context,
                       icon: Icons.settings,
@@ -192,11 +186,24 @@ class _ProfilePageState extends State<ProfilePage_user> {
                       title: 'Legal',
                       destination: AccountSettingsPage(),
                     ),
+
+                    // Logout Item using onTap
                     _buildMenuItem(
                       context: context,
                       icon: Icons.logout,
                       title: 'Log out',
-                      destination: AccountSettingsPage(),
+                      onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('isLoggedIn', false);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    OnboardingScreen(isLoggedIn: false),
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: height * 0.03),
                   ],
@@ -232,22 +239,28 @@ class _ProfilePageState extends State<ProfilePage_user> {
     );
   }
 
+  /// Fixed versatile menu builder
   Widget _buildMenuItem({
     required BuildContext context,
     required IconData icon,
     required String title,
-    required Widget destination,
+    Widget? destination,
+    VoidCallback? onTap,
   }) {
     return ListTile(
       leading: Icon(icon, size: 24),
       title: Text(title),
       trailing: Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => destination),
-        );
-      },
+      onTap:
+          onTap ??
+          () {
+            if (destination != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => destination),
+              );
+            }
+          },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leez/screens/onboarding/onboarding.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -139,7 +140,15 @@ class MenuScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle logout
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  const OnboardingScreen(isLoggedIn: false),
+                        ),
+                        (route) => false, // remove all previous routes
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
